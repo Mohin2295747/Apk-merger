@@ -1,0 +1,41 @@
+name: Merge APKs
+
+on:
+  push:
+    workflow_dispatch:
+
+jobs:
+  merge-apks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+
+      - name: Install dependencies (apktool, AMT)
+        run: |
+          sudo apt update
+          sudo apt install -y apktool
+          git clone https://github.com/FoelliX/AMT.git
+          cd AMT
+          ./gradlew build
+
+      - name: Copy APK files from apk folder
+        run: |
+          mkdir apks
+          cp ./apk/*.apk ./apks/
+
+      - name: Merge APKs
+        run: |
+          cd AMT
+          ./build/libs/amt.jar --apks ../apks/*.apk --output ../merged.apk
+
+      - name: Upload merged APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: merged-apk
+          path: merged.apk
