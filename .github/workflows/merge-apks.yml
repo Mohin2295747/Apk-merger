@@ -32,8 +32,14 @@ jobs:
       - name: Copy APK files to AMT directory
         run: cp -r ./apk/*.apk AMT/AMT/apks/
 
+      - name: Check if APKs are in place
+        run: |
+          ls -l AMT/AMT/apks/
+
       - name: Modify amt.properties file
-        run: echo "androidPlatforms=/path/to/Android/sdks/platforms" > AMT/AMT/amt.properties
+        run: |
+          echo "androidPlatforms=/path/to/Android/sdks/platforms" > AMT/AMT/amt.properties
+          cat AMT/AMT/amt.properties
 
       - name: Run AMT
         run: |
