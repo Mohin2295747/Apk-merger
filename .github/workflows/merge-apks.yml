@@ -28,8 +28,11 @@ jobs:
           
       - name: Create amt.properties file
         run: |
-          echo "output_dir=./output" > AMT/amt.properties
-          echo "log_level=INFO" >> AMT/amt.properties
+          echo "androidPlatforms=/path/to/Android/sdks/platforms" > AMT/amt.properties
+          echo "apktoolPath=/path/to/apktool" >> AMT/amt.properties
+          echo "apktoolJar=apktool_2.6.0.jar" >> AMT/amt.properties
+          echo "outputFolder=output" >> AMT/amt.properties
+          echo "defaultExcludes=android.support.*, com.google.*, androidx.*, kotlin.*" >> AMT/amt.properties
 
       - name: Copy APK files from apk folder
         run: |
