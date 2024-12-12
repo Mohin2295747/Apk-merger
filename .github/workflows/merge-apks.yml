@@ -1,6 +1,7 @@
 name: Merge APKs
 
 on:
+push:
   workflow_dispatch: # Manual trigger
 
 jobs:
@@ -16,13 +17,13 @@ jobs:
           java-version: '11'
           distribution: 'temurin'  # Updated Java distribution
 
-      - name: Install dependencies (apktool, AMT)
+      - name: Install dependencies (apktool, Gradle, AMT)
         run: |
           sudo apt update
-          sudo apt install -y apktool
+          sudo apt install -y apktool gradle
           git clone https://github.com/FoelliX/AMT.git
           cd AMT
-          ./gradlew build
+          gradle build
 
       - name: Copy APK files from apk folder
         run: |
