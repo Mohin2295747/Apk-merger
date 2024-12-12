@@ -1,51 +1,39 @@
-name: Merge APKs
+name: Apk Merger Workflow
 
 on:
-  workflow_dispatch: # Manual trigger
+  push:
+    branches:
+      - main
 
 jobs:
-  merge-apks:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        
-      - name: Set up Java 17
-        uses: actions/setup-java@v2
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+    - name: Checkout the repository
+      uses: actions/checkout@v2
 
-      - name: Install dependencies (apktool, unzip, curl)
-        run: |
-          sudo apt update
-          sudo apt install -y apktool unzip curl
+    - name: Download and extract AMT tool
+      run: |
+        wget https://github.com/FoelliX/AMT/releases/download/2.0.0/AMT_2_0_0.zip
+        unzip AMT_2_0_0.zip -d AMT
 
-      - name: Download and extract AMT zip
-        run: |
-          curl -L -o AMT.zip https://github.com/FoelliX/AMT/releases/download/2.0.0/AMT_2_0_0.zip
-          unzip AMT.zip -d AMT
-          
-      - name: Create amt.properties file
-        run: |
-          echo "androidPlatforms=/path/to/Android/sdks/platforms" > AMT/AMT/amt.properties
-          echo "apktoolPath=/path/to/apktool" >> AMT/AMT/amt.properties
-          echo "apktoolJar=apktool_2.6.0.jar" >> AMT/AMT/amt.properties
-          echo "outputFolder=output" >> AMT/AMT/amt.properties
-          echo "defaultExcludes=android.support.*, com.google.*, androidx.*, kotlin.*" >> AMT/AMT/amt.properties
+    - name: Configure AMT
+      run: |
+        echo "androidPlatforms=/path/to/Android/sdks/platforms" > AMT/AMT/amt.properties
 
-      - name: Copy APK files to the working directory
-        run: |
-          mkdir -p AMT/AMT/apks
-          cp ./apk/* AMT/AMT/apks/
+    - name: Copy APK files to the working directory
+      run: |
+        mkdir -p AMT/AMT/apks
+        cp ./apk/*.apk AMT/AMT/apks/
 
-      - name: Merge APKs
-        run: |
-          cd AMT/AMT
-          java -jar AMT-2.0.0.jar --apks ./apks/*.apk --output ./output/merged.apk
+    - name: Run the APK merging tool
+      run: |
+        cd AMT/AMT
+        java -jar AMT-2.0.0.jar -d verbose ./apks/*.apk
 
-      - name: Upload merged APK
-        uses: actions/upload-artifact@v3
-        with:
-          name: merged-apk
-          path: AMT/AMT/output/merged.apk
+    - name: Upload merged APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: merged-apk
+        path: AMT/AMT/output/merged.apk
