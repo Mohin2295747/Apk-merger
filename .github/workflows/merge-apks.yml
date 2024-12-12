@@ -35,7 +35,8 @@ jobs:
 
       - name: Setup Android SDK path
         run: echo "androidPlatforms=/usr/lib/android-sdk/platforms" > AMT/AMT/amt.properties
-
+      - name: List AMT directory contents
+  run: ls -l AMT/AMT/
       - name: Run AMT merging
         run: java -jar AMT/AMT/AMT-2.0.0.jar Tachiyomi_1.apk Tachiyomi_2.apk
 
