@@ -32,9 +32,13 @@ jobs:
       - name: Copy APK files to AMT directory
         run: cp -r ./apk/*.apk AMT/AMT/apks/
 
-      - name: Check if APKs are in place
+      - name: List APK files in apks folder
+        run: ls -l AMT/AMT/apks/
+
+      - name: Check the contents of AMT directory
         run: |
-          ls -l AMT/AMT/apks/
+          echo "Contents of AMT directory:"
+          ls -l AMT/AMT/
 
       - name: Modify amt.properties file
         run: |
