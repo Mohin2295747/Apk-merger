@@ -1,57 +1,48 @@
-name: Apk Merger
+name: APK Merging Workflow
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  merge_apks:
+  build:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Setup Java
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'zulu'
-          java-version: '17'
+    - name: Set up Java 17 (Zulu)
+      uses: actions/setup-java@v2
+      with:
+        distribution: zulu
+        java-version: '17'
 
-      - name: Download AMT ZIP
-        run: |
-          curl -L -o AMT.zip https://github.com/FoelliX/AMT/releases/download/2.0.0/AMT_2_0_0.zip
-          unzip AMT.zip -d AMT
+    - name: Download AMT
+      run: |
+        curl -L https://github.com/FoelliX/AMT/releases/download/2.0.0/AMT_2_0_0.zip -o AMT.zip
+        unzip AMT.zip -d AMT
+        ls -l AMT/AMT
 
-      - name: Create apks directory
-        run: mkdir -p AMT/AMT/apks
+    - name: Copy APK files
+      run: |
+        mkdir -p AMT/AMT/apks
+        cp -r ./apk/*.apk AMT/AMT/apks/
+        ls -l AMT/AMT/apks/
 
-      - name: Copy APK files to AMT directory
-        run: cp -r ./apk/*.apk AMT/AMT/apks/
+    - name: Set up amt.properties
+      run: |
+        echo "androidPlatforms=/usr/lib/android-sdk/platforms" > AMT/AMT/amt.properties
+        cat AMT/AMT/amt.properties
 
-      - name: List APK files in apks folder
-        run: ls -l AMT/AMT/apks/
-
-      - name: Check the contents of AMT directory
-        run: |
-          echo "Contents of AMT directory:"
-          ls -l AMT/AMT/
-
-      - name: Modify amt.properties file
-        run: |
-          echo "androidPlatforms=/path/to/Android/sdks/platforms" > AMT/AMT/amt.properties
-          cat AMT/AMT/amt.properties
-
-      - name: Run AMT
-        run: |
-          cd AMT/AMT
-          java -jar AMT-2.0.0.jar -check -d verbose
-
-      - name: Upload merged APK artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: merged-apk
-          path: AMT/AMT/output/merged.apk
+    - name: Run AMT
+      run: |
+        java -jar AMT/AMT/AMT-2.0.0.jar A.apk B.apk
+        ls -l AMT/AMT/output/
+      
+    - name: Upload merged APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: merged-apk
+        path: AMT/AMT/output/merged.apk
