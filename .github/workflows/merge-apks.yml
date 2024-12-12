@@ -1,7 +1,10 @@
-name: Apk Merger Workflow
+name: APK Merger Workflow
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -10,39 +13,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Step 2: Download AMT 2.0.0
-      - name: Download AMT 2.0.0
-        run: wget https://github.com/FoelliX/AMT/releases/download/2.0.0/AMT_2_0_0.zip
-
-      # Step 3: Extract AMT
-      - name: Extract AMT
-        run: unzip AMT_2_0_0.zip -d AMT/
-
-      # Step 4: Set up Java environment
-      - name: Set up Java 17
+      - name: Setup Java
         uses: actions/setup-java@v2
         with:
-          java-version: '17'
-          distribution: 'zulu'
+          distribution: zulu
+          java-version: 17
 
-      # Step 5: Copy APK files into AMT's directory
+      - name: Download AMT
+        run: |
+          wget https://github.com/FoelliX/AMT/releases/download/2.0.0/AMT_2_0_0.zip
+          unzip AMT_2_0_0.zip
+
+      - name: Create APKs directory
+        run: mkdir -p AMT/AMT/apks/
+
       - name: Copy APK files
         run: cp -r ./apk/*.apk AMT/AMT/apks/
 
-      # Step 6: Set Android platforms in amt.properties
-      - name: Set Android platforms path
+      - name: Setup Android SDK path
         run: echo "androidPlatforms=/usr/lib/android-sdk/platforms" > AMT/AMT/amt.properties
 
-      # Step 7: Run AMT
-      - name: Run AMT
-        run: java -jar AMT/AMT/AMT-2.0.0.jar Tachiyomi_ Cocomic_1.4.38.apk Tachiyomi_ Mangahasu_1.4.17.apk
+      - name: Run AMT merging
+        run: java -jar AMT/AMT/AMT-2.0.0.jar Tachiyomi_1.apk Tachiyomi_2.apk
 
-      # Step 8: Upload output artifact (merged APK)
-      - name: Upload Merged APK
+      - name: Upload merged APK artifact
         uses: actions/upload-artifact@v3
         with:
           name: merged-apk
