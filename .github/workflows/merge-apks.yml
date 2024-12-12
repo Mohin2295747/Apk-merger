@@ -1,8 +1,7 @@
 name: Merge APKs
 
 on:
-  push:
-    workflow_dispatch:
+  workflow_dispatch: # Manual trigger
 
 jobs:
   merge-apks:
@@ -15,6 +14,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
+          distribution: 'adoptopenjdk'  # or 'zulu' depending on your preference
 
       - name: Install dependencies (apktool, AMT)
         run: |
