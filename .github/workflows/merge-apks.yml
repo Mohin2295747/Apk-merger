@@ -1,7 +1,10 @@
-name: APK Merging Workflow
+name: APK Merger Workflow
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -11,37 +14,48 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
 
-    - name: Set up Java 17 (Zulu)
+    - name: Setup Java
       uses: actions/setup-java@v2
       with:
-        distribution: zulu
+        distribution: 'zulu'
         java-version: '17'
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y unzip openjdk-17-jdk
 
     - name: Download AMT
       run: |
-        curl -L https://github.com/FoelliX/AMT/releases/download/2.0.0/AMT_2_0_0.zip -o AMT.zip
+        wget https://github.com/Foellix/AMT/releases/download/v2.0.0/AMT.zip
         unzip AMT.zip -d AMT
-        ls -l AMT/AMT
 
-    - name: Copy APK files
+    - name: Verify amt.properties file
+      run: |
+        cat AMT/AMT/amt.properties
+
+    - name: Copy APKs to AMT
       run: |
         mkdir -p AMT/AMT/apks
         cp -r ./apk/*.apk AMT/AMT/apks/
-        ls -l AMT/AMT/apks/
 
-    - name: Set up amt.properties
+    - name: Debug working directory
+      run: |
+        ls -l AMT/AMT
+        ls -l
+
+    - name: Set androidPlatforms path
       run: |
         echo "androidPlatforms=/usr/lib/android-sdk/platforms" > AMT/AMT/amt.properties
-        cat AMT/AMT/amt.properties
 
-    - name: Run AMT
+    - name: Run AMT merge
       run: |
-        java -jar AMT/AMT/AMT-2.0.0.jar A.apk B.apk
-        ls -l AMT/AMT/output/
-      
-    - name: Upload merged APK artifact
+        cd AMT/AMT
+        java -jar AMT-2.0.0.jar Tachiyomi_ Cocomic_1.4.38.apk Tachiyomi_ Mangahasu_1.4.17.apk
+
+    - name: Upload merged APK
       uses: actions/upload-artifact@v3
       with:
         name: merged-apk
