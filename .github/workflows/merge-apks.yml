@@ -33,7 +33,7 @@ jobs:
       - name: Merge APKs
         run: |
           cd AMT
-          ./build/libs/amt.jar --apks ../apks/*.apk --output ../merged.apk
+          java -jar ./path/to/amt.jar --apks ../apks/*.apk --output ../merged.apk
 
       - name: Upload merged APK
         uses: actions/upload-artifact@v3
