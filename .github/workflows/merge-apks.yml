@@ -1,7 +1,10 @@
-name: APK Merging Workflow
+name: Apk Merger
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -13,37 +16,33 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Java 17
+    - name: Setup JDK
       uses: actions/setup-java@v2
       with:
         distribution: zulu
-        java-version: '17'
+        java-version: 17
 
-    - name: Download AMT Zip
-      run: wget https://github.com/FoelliX/AMT/releases/download/2.0.0/AMT_2_0_0.zip
+    - name: Download AMT.zip
+      run: |
+        wget https://github.com/FoelliX/AMT/releases/download/2.0.0/AMT_2_0_0.zip
+        unzip AMT_2_0_0.zip -d AMT
 
-    - name: Unzip AMT
-      run: unzip AMT_2_0_0.zip -d AMT
+    - name: Check if amt.properties exists
+      run: ls -l AMT/AMT/amt.properties
 
-    - name: List AMT directory contents
-      run: ls -l AMT/AMT/
-
-    - name: Create apks directory
-      run: mkdir -p AMT/AMT/apks
-
-    - name: Copy APKs to AMT apks directory
-      run: cp -r ./apk/*.apk AMT/AMT/apks/
-
-    - name: Check AMT Directory Contents
-      run: ls -l AMT/AMT/apks/
-
-    - name: Set androidPlatforms in amt.properties
+    - name: Ensure correct path in amt.properties
       run: echo "androidPlatforms=/usr/lib/android-sdk/platforms" > AMT/AMT/amt.properties
 
-    - name: Run AMT tool
+    - name: List contents of AMT directory
+      run: ls -l AMT/AMT/
+
+    - name: Copy APK files
+      run: cp -r ./apk/*.apk AMT/AMT/apks/
+
+    - name: Run APK merger
       run: java -jar AMT/AMT/AMT-2.0.0.jar Tachiyomi_1.apk Tachiyomi_2.apk
 
-    - name: Upload merged APK
+    - name: Upload merged APK as artifact
       uses: actions/upload-artifact@v3
       with:
         name: merged-apk
