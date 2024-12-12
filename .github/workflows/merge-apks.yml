@@ -1,7 +1,6 @@
 name: Merge APKs
 
 on:
-
   workflow_dispatch: # Manual trigger
 
 jobs:
@@ -17,13 +16,15 @@ jobs:
           java-version: '11'
           distribution: 'temurin'  # Updated Java distribution
 
-      - name: Install dependencies (apktool, Gradle, AMT)
+      - name: Install dependencies (apktool, unzip, curl)
         run: |
           sudo apt update
-          sudo apt install -y apktool gradle
-          git clone https://github.com/FoelliX/AMT.git
-          cd AMT
-          gradle build
+          sudo apt install -y apktool unzip curl
+
+      - name: Download and extract AMT zip
+        run: |
+          curl -L -o AMT.zip https://github.com/FoelliX/AMT/releases/download/2.0.0/AMT_2_0_0.zip
+          unzip AMT.zip -d AMT
 
       - name: Copy APK files from apk folder
         run: |
@@ -33,7 +34,7 @@ jobs:
       - name: Merge APKs
         run: |
           cd AMT
-          java -jar ./path/to/amt.jar --apks ../apks/*.apk --output ../merged.apk
+          java -jar ./AMT_2_0_0/amt.jar --apks ../apks/*.apk --output ../merged.apk
 
       - name: Upload merged APK
         uses: actions/upload-artifact@v3
