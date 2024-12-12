@@ -42,7 +42,7 @@ jobs:
       - name: Merge APKs
         run: |
           cd AMT
-          java -jar ./AMT-2.0.0.jar --apks ./apks/*.apk --output ./output/merged.apk
+          java -jar AMT-2.0.0.jar --apks ./apks/*.apk --output ./output/merged.apk
 
       - name: Upload merged APK
         uses: actions/upload-artifact@v3
