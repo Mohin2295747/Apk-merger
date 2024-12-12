@@ -13,6 +13,12 @@ jobs:
     - name: Checkout the repository
       uses: actions/checkout@v2
 
+    - name: Set up Java 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'adoptopenjdk'
+
     - name: Download and extract AMT tool
       run: |
         wget https://github.com/FoelliX/AMT/releases/download/2.0.0/AMT_2_0_0.zip
