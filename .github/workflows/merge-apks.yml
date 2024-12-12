@@ -26,6 +26,11 @@ jobs:
           curl -L -o AMT.zip https://github.com/FoelliX/AMT/releases/download/2.0.0/AMT_2_0_0.zip
           unzip AMT.zip -d AMT
           
+      - name: Create amt.properties file
+        run: |
+          echo "output_dir=./output" > AMT/amt.properties
+          echo "log_level=INFO" >> AMT/amt.properties
+
       - name: Copy APK files from apk folder
         run: |
           mkdir apks
