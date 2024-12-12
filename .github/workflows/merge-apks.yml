@@ -37,7 +37,7 @@ jobs:
       - name: Copy APK files to the working directory
         run: |
           mkdir -p AMT/AMT/apks
-          cp ./apk/*.apk AMT/AMT/apks/
+          cp ./apk/* AMT/AMT/apks/
 
       - name: Merge APKs
         run: |
