@@ -34,18 +34,18 @@ jobs:
           echo "outputFolder=output" >> AMT/amt.properties
           echo "defaultExcludes=android.support.*, com.google.*, androidx.*, kotlin.*" >> AMT/amt.properties
 
-      - name: Copy APK files from apk folder
+      - name: Copy APK files to the working directory
         run: |
-          mkdir apks
-          cp ./apk/*.apk ./apks/
+          mkdir -p AMT/apks
+          cp ./apk/*.apk AMT/apks/
 
       - name: Merge APKs
         run: |
           cd AMT
-          java -jar ./AMT/AMT-2.0.0.jar --apks ../apks/*.apk --output ../output/merged.apk
+          java -jar ./AMT-2.0.0.jar --apks ./apks/*.apk --output ./output/merged.apk
 
       - name: Upload merged APK
         uses: actions/upload-artifact@v3
         with:
           name: merged-apk
-          path: output/merged.apk
+          path: AMT/output/merged.apk
